@@ -52,17 +52,29 @@ namespace forestFire {
 
 
             game.onUpdate(() => {
-                const totalTrees = this.timeBuffer.width * this.timeBuffer.height;
 
+                let burntTrees = 0;
                 let unburntTrees = 0;
                 let activeFires = 0;
 
+                for (const tile of this.unburntTileCache) {
+                    unburntTrees += tiles.getTilesByType(tile).length;
+                }
+
                 for (let x = 0; x < this.timeBuffer.width; x++) {
                     for (let y = 0; y < this.timeBuffer.height; y++) {
-                        if (this.timeBuffer.getPixel(x, y) === 0) unburntTrees++;
-                        else if (this.timeBuffer.getPixel(x, y) < 15) activeFires++;
+                        if (this.timeBuffer.getPixel(x, y) === 0) continue;
+                        else if (this.timeBuffer.getPixel(x, y) < 15) {
+                            activeFires++;
+                            burntTrees++;
+                        }
+                        else if (this.timeBuffer.getPixel(x, y) === 15) {
+                            burntTrees ++;
+                        }
                     }
                 }
+
+                const totalTrees = unburntTrees + burntTrees;
 
                 hud.updateForestHealth(totalTrees, unburntTrees);
                 hud.updateFireNumber(activeFires)
@@ -217,8 +229,14 @@ namespace forestFire {
 
             if (this.timeBuffer.getPixel(location.col, location.row)) return false;
 
-            this.createFireAtLocation(location, tileImage, this.fireImage)
-            return true;
+            for (const tile of this.unburntTileCache) {
+                if (tileImage.equals(tile)) {
+                    this.createFireAtLocation(location, tileImage, this.fireImage)
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         onFireCreated(handler: (location: tiles.Location) => void) {
