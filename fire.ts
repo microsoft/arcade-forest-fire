@@ -248,10 +248,6 @@ namespace forestFire {
         }
 
         setFireHealth(location: tiles.Location, health: number) {
-            const timeRemaining = this.timeBuffer.getPixel(location.col, location.row);
-
-            if (timeRemaining === 0 || timeRemaining === 15) return;
-
             health = Math.max(0, Math.min(health, 15));
             this.healthBuffer.setPixel(location.col, location.row, health);
 
