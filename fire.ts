@@ -12,7 +12,7 @@ namespace forestFire {
         fireImage: Image;
 
         windSpeed: number;
-        tinder: number;
+        treeHealth: number;
         dryGrass: number;
 
         fireCreatedHandlers: ((location: tiles.Location) => void)[];
@@ -44,7 +44,7 @@ namespace forestFire {
             this.fireDestroyedHandlers = [];
 
             this.windSpeed = 5;
-            this.tinder = 4;
+            this.treeHealth = 4;
             this.dryGrass = 5;
 
             this.fireHasStarted = false;
@@ -79,11 +79,11 @@ namespace forestFire {
                 hud.updateForestHealth(totalTrees, unburntTrees);
                 hud.updateFireNumber(activeFires)
 
-                if (this.spreadTime >= 4000) {
+                if (this.danger < 2.5) {
                     hud.updateDangerBarColors(7)
-                } else if (this.spreadTime >= 3000) {
+                } else if (this.danger < 5) {
                     hud.updateDangerBarColors(5)
-                } else if (this.spreadTime >= 2000) {
+                } else if (this.danger < 7.5) {
                     hud.updateDangerBarColors(4)
                 } else {
                     hud.updateDangerBarColors(2)
@@ -98,8 +98,12 @@ namespace forestFire {
             })
         }
 
+        get danger() {
+            return (this.windSpeed + this.dryGrass + (10 - this.treeHealth)) / 3
+        }
+
         get spreadTime() {
-            return 4500 - this.windSpeed * 250 - this.dryGrass * 250 - this.tinder * 100;
+            return 4500 - (this.danger / 10) * 3500;
         }
 
         getRandomSpreadInterval() {
@@ -176,6 +180,8 @@ namespace forestFire {
             // Loop over every location in the timeBuffer and update the times
             for (let x = 0; x < this.timeBuffer.width; x++) {
                 for (let y = 0; y < this.timeBuffer.height; y++) {
+                    if (Math.percentChance(30 * (10 - this.danger) / 10)) continue;
+
                     current = this.timeBuffer.getPixel(x, y);
 
                     // If the value is 0, the fire hasn't started yet
@@ -289,8 +295,8 @@ namespace forestFire {
         state.dryGrass = grass;
     }
 
-    export function setTinder(tinder: number) {
-        state.tinder = tinder;
+    export function setTreeHealth(treeHealth: number) {
+        state.treeHealth = treeHealth;
     }
 
     export function setFireHealth(location: tiles.Location, health: number) {
