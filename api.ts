@@ -11,8 +11,10 @@ namespace game {
      */
     //% block="set strength of wind to $num"
     //% num.defl=3
+    //% num.min=0
+    //% num.max=10
     export function set_strength_of_wind(num: number) {
-        forestFire.setWindSpeed(num);
+        forestFire.setWindSpeed(Math.clamp(0, 10, num));
     }
 
     /*
@@ -21,8 +23,10 @@ namespace game {
      */
     //% block="set health of trees to $num"
     //% num.defl=7
+    //% num.min=0
+    //% num.max=10
     export function set_health_of_trees(num: number) {
-        forestFire.setTinder(num);
+        forestFire.setTreeHealth(Math.clamp(0, 10, num));
     }
 
     /*
@@ -31,8 +35,10 @@ namespace game {
      */
     //% block="set dryness of grass to $num"
     //% num.defl=3
+    //% num.min=0
+    //% num.max=10
     export function set_dryness_of_grass(num: number) {
-        forestFire.setDryGrass(num);
+        forestFire.setDryGrass(Math.clamp(0, 10, num));
     }
 }
 
@@ -46,7 +52,7 @@ namespace sprites {
     //% block="set strength of fire at $location to $health"
     //% location.shadow=variables_get
     //% location.defl=location
-    //% health.defl=10
+    //% health.defl=5
     export function set_flame_strength(location: tiles.Location, health: number) {
         forestFire.setFireHealth(location, health)
     }
@@ -133,7 +139,7 @@ namespace sprites {
     }
 
     /**
-     * 
+     *
      */
     //% block="create spreading fire on random $onTile with image $burningTile"
     //% onTile.shadow=tileset_tile_picker
